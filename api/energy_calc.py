@@ -1,7 +1,24 @@
 from data_objects import EnergyDataObject, EnergyDataPoint
-import datetime
+from datetime import datetime, timedelta
+import time
 from typing import Tuple
 
+def get_previous_day_uk() -> str:
+    """
+    Get the date of the previous day in UK time, in ISO format (YYYY-MM-DD).
+    """
+    # Get the current time in UTC
+    utc_now = datetime.utcnow()
+    
+    # Convert UTC to UK time (considering daylight saving time)
+    uk_offset = time.localtime().tm_hour - time.gmtime().tm_hour
+    uk_time = utc_now + timedelta(hours=uk_offset)
+    
+    # Calculate the previous day
+    previous_day = uk_time - timedelta(days=1)
+    
+    # Return the date in ISO format
+    return previous_day.date().isoformat()
 
 def calculate_daily_imbalance(energy_data: EnergyDataObject) -> Tuple[float, float]:
     """
