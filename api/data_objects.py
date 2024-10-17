@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
 
 @dataclass
@@ -14,4 +14,4 @@ class EnergyDataPoint:
 class EnergyDataObject:
     """Represents energy data for a specific date."""
     settlement_date: str
-    data_points: List[EnergyDataPoint]
+    data_points: List['EnergyDataPoint'] = field(default_factory=list)
