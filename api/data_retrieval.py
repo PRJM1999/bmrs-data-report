@@ -4,6 +4,7 @@ from typing import Optional
 import requests
 from requests.exceptions import RequestException
 from api.data_objects import EnergyDataObject, EnergyDataPoint
+from datetime import datetime
 
 
 class EnergyDataFetcher(ABC):
@@ -46,6 +47,16 @@ class ElexonBrmsFetcher(EnergyDataFetcher):
             RequestException: If there is an error making the API request.
             ValueError: If the API response contains unexpected data.
         """
+        # Check if the requested date is at least one day in the past
+        try:
+            requested_date = datetime.strptime(date, "%Y-%m-%d").date()
+        except ValueError:
+            raise ValueError("Invalid date format. Please use YYYY-MM-DD.")
+
+        today = datetime.now().date()
+        if requested_date >= today:
+            raise ValueError("Requested date must be at least one day in the past.")
+        
         endpoint = f"/balancing/settlement/system-prices/{date}"
         params = {"format": "json"}
         url = f"{self._API_BASE_URL}{endpoint}"
@@ -71,8 +82,13 @@ class ElexonBrmsFetcher(EnergyDataFetcher):
                         item["netImbalanceVolume"],
                     )
                     energy_data.data_points.append(data_point)
+                    print(item["startTime"])
                 except KeyError as e:
                     raise ValueError(f"Unexpected data format in API response: {e}")
+            
+            # Check  expected number of data points
+            if len(energy_data.data_points) != 48:
+                raise ValueError(f"Incomplete data: received {len(energy_data.data_points)} data points instead of 48.")
 
             return energy_data
 
@@ -80,12 +96,3 @@ class ElexonBrmsFetcher(EnergyDataFetcher):
             if e.response is not None and e.response.status_code == 404:
                 return None
             raise
-
-
-from datetime import date, timedelta
-
-
-valid_date = (date.today() - timedelta(days=1)).isoformat()
-
-energy_data = ElexonBrmsFetcher().fetch_energy_data(valid_date)
-print(energy_data)
