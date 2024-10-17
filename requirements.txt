@@ -3,4 +3,5 @@ Flask-Cors
 requests
 Flask-RESTful
 pytest
+pytest-flask
 pandas
