@@ -26,7 +26,7 @@ Technology Stack
 
 Project Structure
 -----------------
-
+`
 BMRS-Data_Report/
 │
 ├── api/
@@ -43,6 +43,7 @@ BMRS-Data_Report/
 ├── requirements.txt
 ├── README.md
 └── run.py
+`
 
 
 Installation
