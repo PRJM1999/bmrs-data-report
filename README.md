@@ -27,9 +27,7 @@ Technology Stack
 Project Structure
 -----------------
 
-Copy
-
-`energy_imbalance_report/
+BMRS-Data_Report/
 │
 ├── api/
 │   ├── __init__.py
@@ -44,27 +42,22 @@ Copy
 │
 ├── requirements.txt
 ├── README.md
-└── run.py`
+└── run.py
+
 
 Installation
 ------------
 
 1.  Clone the repository:
 
-    Copy
-
     `git clone https://github.com/PRJM1999/bmrs-data-report.git`
 
 2.  Create and activate a virtual environment:
-
-    Copy
 
     `python -m venv venv
     source venv/bin/activate  # On Windows, use `venv\Scripts\activate``
 
 3.  Install the required packages:
-
-    Copy
 
     `pip install -r requirements.txt`
 
@@ -72,8 +65,6 @@ Usage
 -----
 
 To start the Flask server:
-
-Copy
 
 `python run.py`
 
