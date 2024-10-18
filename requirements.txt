@@ -5,3 +5,4 @@ Flask-RESTful
 pytest
 pytest-flask
 pandas
+reportlab

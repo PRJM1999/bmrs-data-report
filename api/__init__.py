@@ -1,7 +1,7 @@
 from flask import Flask 
 from flask_restful import Api
 from flask_cors import CORS
-from api.endpoints import DailyImbalance, HighestImbalanceHour
+from api.endpoints import DailyImbalance, HighestImbalanceHour, EnergyReport
 import logging
 
 # Create App
@@ -17,6 +17,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 # Add resources to the API
 api.add_resource(DailyImbalance, '/daily_imbalance')
 api.add_resource(HighestImbalanceHour, '/highest_imbalance_hour')
+api.add_resource(EnergyReport, '/energy_report')
 
 @app.route('/')
 def index():
