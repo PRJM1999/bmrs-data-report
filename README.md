@@ -24,28 +24,6 @@ Technology Stack
 -   ReportLab for PDF generation
 -   Pytest for unit testing
 
-Project Structure
------------------
-`
-BMRS-Data_Report/
-│
-├── api/
-│   ├── __init__.py
-│   ├── data_objects.py
-│   ├── data_retrieval.py
-│   ├── energy_calc.py
-│   ├── endpoints.py
-│   └── report_generation.py
-│
-├── tests/
-│   └── ... (test files)
-│
-├── requirements.txt
-├── README.md
-└── run.py
-`
-
-
 Installation
 ------------
 
