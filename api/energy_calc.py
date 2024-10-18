@@ -37,16 +37,18 @@ def calculate_daily_imbalance(energy_data: EnergyDataObject) -> Tuple[float, flo
     total_imbalance_volume = 0.0
 
     for data_point in energy_data.data_points:
-        # Calculate the imbalance cost settlement period
-        imbalance_volume = abs(data_point.net_imbalance_volume)
-        imbalance_price = max(data_point.system_buy_price, data_point.system_sell_price)
-        period_imbalance_cost = imbalance_volume * imbalance_price
+        imbalance_volume = abs(data_point.net_imbalance_volume)  # Get the absolute imbalance volume
+        
+        if data_point.net_imbalance_volume > 0:  # System is short, use buy price
+            period_imbalance_cost = data_point.net_imbalance_volume * data_point.system_buy_price
+        else:  # System is long, use sell price
+            period_imbalance_cost = abs(data_point.net_imbalance_volume) * data_point.system_sell_price
 
         # Accumulate the total cost and volume
         total_imbalance_cost += period_imbalance_cost
         total_imbalance_volume += imbalance_volume
 
-    # Calculate the daily imbalance unit rate
+    # Calculate the daily imbalance unit rate (average cost per unit of imbalance volume)
     if total_imbalance_volume > 0:
         daily_imbalance_unit_rate = total_imbalance_cost / total_imbalance_volume
     else:
