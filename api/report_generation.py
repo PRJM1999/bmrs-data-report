@@ -7,6 +7,7 @@ import matplotlib
 matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 import io
+from datetime import datetime
 
 class ReportGenerator:
     @staticmethod
@@ -17,8 +18,13 @@ class ReportGenerator:
 
         styles = getSampleStyleSheet()
         
-        # Title
+        # First Page
         elements.append(Paragraph("Energy Data Report", styles['Title']))
+        elements.append(Spacer(1, 6*mm))
+
+        # Summary sentence
+        summary = f"This report presents energy imbalance data for {daily_imbalance['date']}, sourced from the Elexon BMRS API. It includes daily imbalance costs, hourly imbalance volumes, and detailed settlement period data."
+        elements.append(Paragraph(summary, styles['Normal']))
         elements.append(Spacer(1, 6*mm))
 
         # Daily Imbalance
@@ -59,9 +65,15 @@ class ReportGenerator:
             ('GRID', (0, 0), (-1, -1), 1, colors.black)
         ]))
         elements.append(t)
+
+        # Page break after first page
+        elements.append(PageBreak())
+
+        # Second Page - Graphs
+        elements.append(Paragraph("Energy Imbalance Graphs", styles['Heading1']))
         elements.append(Spacer(1, 6*mm))
 
-        # Graph
+        # Net Imbalance Volume Graph
         plt.figure(figsize=(8, 4))
         settlement_periods = [point.settlement_period for point in energy_data.data_points]
         net_imbalance_volumes = [point.net_imbalance_volume for point in energy_data.data_points]
@@ -81,11 +93,38 @@ class ReportGenerator:
         img.drawHeight = 100*mm
         img.drawWidth = 180*mm
         elements.append(img)
+        elements.append(Spacer(1, 6*mm))
 
+        # Hourly Imbalance Graph
+        plt.figure(figsize=(8, 4))
+        hourly_imbalance = [0] * 24
+        for point in energy_data.data_points:
+            hour = datetime.fromisoformat(point.start_time.rstrip('Z')).hour
+            hourly_imbalance[hour] += abs(point.net_imbalance_volume)
+        
+        plt.bar(range(24), hourly_imbalance)
+        plt.title('Hourly Absolute Imbalance Volume')
+        plt.xlabel('Hour')
+        plt.ylabel('Absolute Imbalance Volume (MWh)')
+        plt.xticks(range(0, 24, 2))
+        plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+        plt.tight_layout()
+
+        img_buffer = io.BytesIO()
+        plt.savefig(img_buffer, format='png', dpi=300)
+        img_buffer.seek(0)
+        img = Image(img_buffer)
+        img.drawHeight = 100*mm
+        img.drawWidth = 180*mm
+        elements.append(img)
+
+        # Page break after graphs
         elements.append(PageBreak())
 
-        # Detailed table
-        elements.append(Paragraph("Detailed Energy Data", styles['Heading2']))
+        # Third Page and onwards - Detailed Energy Data
+        elements.append(Paragraph("Detailed Energy Data", styles['Heading1']))
+        elements.append(Spacer(1, 6*mm))
+
         data = [['Period', 'Start Time', 'System Sell Price (£)', 'System Buy Price (£)', 'Net Imbalance Volume (MWh)']]
         for point in energy_data.data_points:
             data.append([
